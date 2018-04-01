@@ -37,8 +37,8 @@ class Validator {
     }
 }
 Validator.prototype.types = {
-    length: (r, val) => val.length > r[0] && val.length < r[1], 
-    size: (r, val) => val > r[0] && val < r[1], 
+    length: (r, val) => (isNaN(r[0]) || val.length > r[0]) && (isNaN(r[1]) || val.length < r[1]), 
+    size: (r, val) => (isNaN(r[0]) || val > r[0]) && (isNaN(r[1]) || val < r[1]), 
     object: (r, val) => new Validator(r).check(val),
     each: (r,val) => {
         let validator = new Validator({val: r})
