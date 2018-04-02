@@ -1,5 +1,5 @@
 class Validator {
-    constructor(structure, options) {
+    constructor(structure, options = {}) {
         if(options && options.all && options.all.required) {
             for(let field in structure) {
                 let val = structure[field]
@@ -46,12 +46,12 @@ Validator.prototype.types = {
     length: (r, val) => (isNaN(r[0]) || val.length > r[0]) && (isNaN(r[1]) || val.length < r[1]),
     size: (r, val) => (isNaN(r[0]) || val > r[0]) && (isNaN(r[1]) || val < r[1]),
     object: (r, val) => {
-      let options = val.options || undefined
+      let options = val.options
       delete val.options
       new Validator(r, options).check(val)
     },
     each: (r,val) => {
-        let options = val.options || undefined
+        let options = val.options
         delete val.options
         let validator = new Validator({val: r}, options)
         return Promise.all(val.map(v => validator.check({val:v})))
