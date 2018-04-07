@@ -1,10 +1,10 @@
 class Validator {
     constructor(structure, options = {}) {
-        if(options && options.all && options.all.required) {
-            for(let field in structure) {
-                let val = structure[field]
-                val.required = true
-            }
+        for(let field in structure) {
+          let val = structure[field]
+          if(options && options.all && options.all.required) {
+            val.required = true
+          }
         }
         this.structure = structure
         this.options = options
@@ -43,18 +43,24 @@ class Validator {
     }
 }
 Validator.prototype.types = {
+    required: (r, val) => !r || true == (val !== undefined && val !== null && val !== ''),
     length: (r, val) => (isNaN(r[0]) || val.length > r[0]) && (isNaN(r[1]) || val.length < r[1]),
     size: (r, val) => (isNaN(r[0]) || val > r[0]) && (isNaN(r[1]) || val < r[1]),
     object: (r, val) => {
+      if(r instanceof Validator) {
+        return r.check(val)
+      }
       let options = val.options
       delete val.options
-      new Validator(r, options).check(val)
+      return (new Validator(r, options)).check(val)
     },
     each: (r,val) => {
+        if(r instanceof Validator) {
+          return Promise.all(val.map(v => r.check(v)))
+        }
         let options = val.options
         delete val.options
         let validator = new Validator({val: r}, options)
-        return Promise.all(val.map(v => validator.check({val:v})))
     },
     type: (r, val) => val.constructor === r,
     email:  (r, val) => r === /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val),
