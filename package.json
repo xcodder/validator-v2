@@ -1,13 +1,15 @@
 {
   "name": "validator-v2",
-  "version": "1.0.1",
+  "version": "1.1.6",
   "description": "Data Validation Made Easy",
   "main": "lib/index.js",
   "scripts": {
-	 "prepublish": "node node_modules/babel-cli/bin/babel.js src --out-dir lib"
+    "prepublish": "node node_modules/babel-cli/bin/babel.js src --out-dir lib"
   },
   "babel": {
-	 "presets": ["es2015"]
+    "presets": [
+      "es2015"
+    ]
   },
   "keywords": [
     "Validation",
