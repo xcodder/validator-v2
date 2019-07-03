@@ -99,7 +99,4 @@ songs.check({id:232, title: "asdadL", duration: "4:35"}, (error, messages) => {
             }, 1000
         });
 
-### Demo
-[Using Html](https://jsbin.com/rineve/edit?css,output)
-
 
