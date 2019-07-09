@@ -1,8 +1,9 @@
 class Validator {
     constructor(structure, options = {}) {
+        let isAllRequired = options && options.all && options.all.required
         for(let field in structure) {
           let val = structure[field]
-          if(options && options.all && options.all.required) {
+          if(isAllRequired) {
             val.required = true
           }
         }
@@ -61,6 +62,7 @@ Validator.prototype.types = {
         let options = val.options
         delete val.options
         let validator = new Validator({val: r}, options)
+        return Promise.all(val.map(v => validator.check(v))) // needs checking
     },
     type: (r, val) => val.constructor === r,
     email:  (r, val) => r === /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val),
