@@ -88,3 +88,5 @@ Validator.prototype.types = {
     regexFail: (r, val) => false === r.test(val),
     validate: (r, val) => r(val)
 }
+
+module.exports = Validator
