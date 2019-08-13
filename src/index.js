@@ -28,12 +28,27 @@ class Validator {
                 }
                 for(let field in fields) {
                     let val = fields[field]
+                    if(field in Validator.prototype.types === false) {
+                      return rej("Invalid field: " + field)
+                    }
                     let check = Validator.prototype.types[field](val, checkVal)
                     if(check instanceof Promise) {
                         proms.push(check)
                     }
                     else if(!check) {
-                        return rej(field)
+                      let onError = fields.onError
+                      if(!onError) {
+                        return rej({field: customField, msg: field})
+                      }
+                      if (typeof onError === "string") {
+                        return rej({field: customField, msg: onError})
+                      } else {
+                        if(onError[field]) {
+                          return rej({field: customField, msg: onError[field]})
+                        } else {
+                          return rej({field: customField, msg: onError.any || field})
+                        }
+                      }
                     }
                 }
             }
@@ -47,6 +62,8 @@ Validator.prototype.types = {
     required: (r, val) => !r || true == (val !== undefined && val !== null && val !== ''),
     length: (r, val) => (isNaN(r[0]) || val.length >= r[0]) && (isNaN(r[1]) || val.length <= r[1]),
     size: (r, val) => (isNaN(r[0]) || val >= r[0]) && (isNaN(r[1]) || val <= r[1]),
+    min: (r, val) => val >= r,
+    max: (r, val) => val <= r,
     object: (r, val) => {
       if(r instanceof Validator) {
         return r.check(val)
@@ -71,5 +88,3 @@ Validator.prototype.types = {
     regexFail: (r, val) => false === r.test(val),
     validate: (r, val) => r(val)
 }
-
-module.exports = Validator
