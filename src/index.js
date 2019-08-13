@@ -59,11 +59,14 @@ class Validator {
     }
 }
 Validator.prototype.types = {
+    onError: (r, val) => true,
     required: (r, val) => !r || true == (val !== undefined && val !== null && val !== ''),
     length: (r, val) => (isNaN(r[0]) || val.length >= r[0]) && (isNaN(r[1]) || val.length <= r[1]),
     size: (r, val) => (isNaN(r[0]) || val >= r[0]) && (isNaN(r[1]) || val <= r[1]),
     min: (r, val) => val >= r,
     max: (r, val) => val <= r,
+    minLen: (r, val) => val.length >= r,
+    maxLen: (r, val) => val.length <= r,
     object: (r, val) => {
       if(r instanceof Validator) {
         return r.check(val)
