@@ -2,7 +2,7 @@
 Javascript module that can be very efficiently and conveniently used with forms validation.  
 Can be used either in html file script tags or as a node.js module
 
-## Use
+## Usage Example
 ```javascript
 
 const Validator = require('validator-v2')
