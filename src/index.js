@@ -40,19 +40,18 @@ class Validator {
 							  proms.push(check)
 						 }
 						 else if(!check) {
+							let rejectionObject = {userField: customField, structureField: field, object: checkObject, msg: ""}
 							let onError = fields.onError
-							if(!onError) {
-							  return rej({field: customField, msg: field, object: checkObject})
-							}
 							if (typeof onError === "string") {
-							  return rej({field: customField, msg: onError, object: checkObject})
-							} else {
+							  rejectionObject.msg = onError
+							} else if(typeof onError === "object") {
 							  if(onError[field]) {
-								 return rej({field: customField, msg: onError[field], object: checkObject})
-							  } else {
-								 return rej({field: customField, msg: onError.any || field, object: checkObject})
+							    rejectionObject.msg = onError[field]
+							  } else if(onError.any) {
+								  rejectionObject.msg = onError.any
 							  }
 							}
+							return rej(rejectionObject)
 						 }
 					}
 			  }

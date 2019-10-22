@@ -4,11 +4,12 @@ Can be used either in html file script tags or as a node.js module
 
 ## Use
 ```javascript
-const dataValidator = require('./data-validator')
-const songs = dataValidator({
+
+const Validator = require('validator-v2')
+const songValidation = new Validator({
     id: {
         required: true,
-        type: "number",
+        type: Number,
         onError: {
             required: "ID is necessary",
             type: "ID is not a number"
@@ -16,18 +17,18 @@ const songs = dataValidator({
     },
     title: {
         required: true,
-        type: "string",
-        minLength: 4,
-        maxLength: 25,
+        type: String,
+        minLen: 4,
+        maxLen: 25,
         regexMatch: /^[a-zA-Z\s]+$/,
         onError: {
             any: "Title must be of 4-25 chars and contain only english letters"
         }
     },
     uploaderUsername: {
-        type: "string",
-        minLength: 4,
-        maxLength: 20,
+        type: String,
+        minLen: 4,
+        maxLen: 20,
         regexMatch: /^[a-zA-Z_]+/,
         onError: {
             any: "Username must be of 4-20 chars",
@@ -36,47 +37,39 @@ const songs = dataValidator({
     },
     duration: {
         required: true,
-        type: "string",
+        type: String,
         regexMatch: /^(\d+):(\d+)$/,
         onError: {
-            regexMatch: "Duration must be of x:y structure. example: 4:25"
+            regexMatch: "Duration must be of m:s structure. example: 4:25"
         }
     }
 })
-songs.check({id:232, title: "asdadL", duration: "4:35"}, (error, messages) => {
-  if(error) {
-    messages.map(m => console.log(m))
-  }
-  else {
-    console.log("Great!")
-  }
-})
+songValidation.check({id: "string id", title: "One Day", duration: "3:35"})
+	.then(() => {
+		console.log("Song is valid")
+	})
+	.catch(err => {
+		console.log(err.msg)
+	})
+
 ```
 
 ### Options
 * required: boolean (default is false)
-* minLength: number (also: *minlen*)
-* maxLength: number (also: *maxlen*)
+* minLen: number
+* maxLen: number
 * length: number(exact length) or array[min, max]
-* validate: function (view validate)
-* type: string (view types)
-* regexMatch: regex (on false is invalid)
-* regexFail: regex (on true is invalid)
-* onError: object (view onError)
-
-
-### Types
-* 'string'
-* 'number' (5,2,3)
-* 'numeric' ('2',4,'12')
-* 'email'
-* 'boolean'
+* validate: function (view below)
+* type: string (Number, String, etc.)
+* regexMatch: regex (on unmatch is invalid)
+* regexFail: regex (on match is invalid)
+* onError: object (view below)
 
 ### onError
-  an object that has a message to return (in the example above, it is supposed to be delievered to the client)  
-  for every option that has failed.  
-  **'any' is a keyword what the default message should be  
-  not more then one (option) message will be returned for a field**
+  an object that decides which message to return on rejection.
+  Every failed field may have its own message.  
+  ** 'any' property is the default error message (for all cases).  
+  ** not more then one (option) message will be returned for a field
   
 ### validate
   #### Use:
