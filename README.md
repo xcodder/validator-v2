@@ -64,12 +64,64 @@ songValidation.check({id: "string id", title: "One Day", duration: "3:35"})
 * regexMatch: regex (on unmatch is invalid)
 * regexFail: regex (on match is invalid)
 * onError: object (view below)
+* object: another validator-v2 instance
+* each: another validator-v2 instance
 
+### object
+```javascript
+let personValidation = new Validator({
+	name: {
+		required: true,
+		type: String
+	},
+	contact: {
+		required: true,
+		object: new Validator({
+			tel: {
+				required: false,
+				regexMatch: /^\d+$/,
+				onError: "Only numbers are allowed in 'tel' field. Remove last 'E' to make it work."
+			},
+			email: {
+				required: true,
+				email: true
+			},
+			address: {
+				required: false,
+				type: String
+			}
+		})
+	}
+ })
+````
+
+### each
+```javascript
+let authorValidation = new Validator({
+	name: {
+		required: true,
+		type: String
+	},
+	books: {
+		each: new Validator({
+			title: {
+				required: true,
+				type: String
+			},
+			pagesAmount: {
+				required: true,
+				type: Number
+			}
+		})
+	}
+ })
+````
+  
 ### onError
-  an object that decides which message to return on rejection.
-  Every failed field may have its own message.  
-  ** 'any' property is the default error message (for all cases).  
-  ** not more then one (option) message will be returned for a field
+An object that decides which message to return on rejection.
+Every failed field may have its own message.  
+** 'any' property is the default error message (for all cases).  
+** not more then one (option) message will be returned for a field
   
 ### validate
   #### Use:
