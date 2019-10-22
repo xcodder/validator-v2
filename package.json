@@ -1,6 +1,6 @@
 {
   "name": "validator-v2",
-  "version": "1.2.0",
+  "version": "1.2.2",
   "description": "Data Validation Made Easy",
   "main": "lib/index.js",
   "scripts": {

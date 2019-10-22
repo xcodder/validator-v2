@@ -64,6 +64,7 @@ class Validator {
 }
 Validator.prototype.types = {
 	onError: (r, val) => true,
+	$arrayIndex: (r, val) => true,
 	required: (r, val) => !r || true == (val !== undefined && val !== null && val !== ''),
 	length: (r, val) => (isNaN(r[0]) || val.length >= r[0]) && (isNaN(r[1]) || val.length <= r[1]),
 	size: (r, val) => (isNaN(r[0]) || val >= r[0]) && (isNaN(r[1]) || val <= r[1]),
@@ -81,10 +82,16 @@ Validator.prototype.types = {
 	},
 	each: (r,val) => {
 		 if(r instanceof Validator) {
-			return Promise.all(val.map(v => r.check(v)))
+
+			return Promise.all(val.map((v, i) => {
+			  if(typeof v === "object") {
+				 v = Object.assign({}, v, {$arrayIndex: i})
+			  }
+			  return r.check(v)
+			  }))
 		 }
 		 let validator = new Validator({val: r})
-		 return Promise.all(val.map(v => validator.check({val:v})))
+		 return Promise.all(val.map((v, i) => validator.check({val:v, $arrayIndex: i})))
 	},
 	type: (r, val) => val.constructor === r,
 	email:  (r, val) => r === /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val),
