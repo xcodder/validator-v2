@@ -2,6 +2,9 @@
 Javascript module that can be very efficiently and conveniently used with forms validation.  
 Can be used either in html file script tags or as a node.js module
 
+# Install
+    npm i install validator-v2
+
 ## Usage Example
 ```javascript
 
