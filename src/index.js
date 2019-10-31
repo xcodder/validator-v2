@@ -1,7 +1,24 @@
 const _urlRegex_ = /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i
 const _domRegex_ = /^(?:(?:(?:[a-zA-z\-]+)\:\/{1,3})?(?:[a-zA-Z0-9])(?:[a-zA-Z0-9-\.]){1,61}[a-zA-Z0-9](?:\.[a-zA-Z]{2,})+|\[(?:(?:(?:[a-fA-F0-9]){1,4})(?::(?:[a-fA-F0-9]){1,4}){7}|::1|::)\]|(?:(?:[0-9]{1,3})(?:\.[0-9]{1,3}){3}))(?:\:[0-9]{1,5})?$/
 
+let __errors = {
+  required: "Please fill in {field}",
+  validate: "{field} value is invalid",
+  email: "Please fill in a valid email",
+  url: "Please fill in a valid URL",
+  def: "Invalid value for {field}"
+}
 
+function genDefErrMsg(field, customFieldName) {
+  let errMsg
+  if(__errors[field]) {
+    errMsg = __errors[field]
+  } else {
+    errMsg = __errors.def
+  }
+
+  return errMsg.replace("{field}", customFieldName)
+}
 class Validator {
 	constructor(structure, options = {}) {
 		 let isAllRequired = options && options.all && options.all.required
@@ -40,7 +57,7 @@ class Validator {
 							  proms.push(check)
 						 }
 						 else if(!check) {
-							let rejectionObject = {userField: customField, structureField: field, object: checkObject, msg: ""}
+							let rejectionObject = {userField: customField, structureField: field, object: checkObject, msg: genDefErrMsg(field, customField)}
 							let onError = fields.onError
 							if (typeof onError === "string") {
 							  rejectionObject.msg = onError
@@ -94,7 +111,8 @@ Validator.prototype.types = {
 	},
 	type: (r, val) => val.constructor === r,
 	email:  (r, val) => r === /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(val),
-	value: (r, val) => r === val,
+  url: (r, val) => r === _urlRegex_.test(val),
+  value: (r, val) => r === val,
 	regexMatch: (r, val) => r.test(val),
 	regexFail: (r, val) => false === r.test(val),
 	validate: (r, val) => r(val)
